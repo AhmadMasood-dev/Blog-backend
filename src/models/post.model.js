@@ -14,13 +14,13 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  image: {
+  postImage: {
     type: String,
   },
-  comment: {
+  comment: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment"
-  }
+  }]
 }, { timestamps: true })
 
 export const Post = mongoose.model("Post", postSchema)

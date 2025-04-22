@@ -4,7 +4,6 @@ import { ApiError } from "../utils/apiError.js"
 import { ApiResponse } from '../utils/ApiResponse.js'
 import { Post } from "../models/post.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
-import { User } from "../models/user.model.js"
 
 
 const createPost = asyncHandler(async (req, res) => {
@@ -13,16 +12,7 @@ const createPost = asyncHandler(async (req, res) => {
   if (!title || !description) {
     throw new ApiError(400, "All fields are required")
   }
-  // const user = req.user
 
-  // if (!user) {
-  //   throw new ApiError(401, "Author not found")
-  // }
-
-  // const { fullName, avatar } = await User.findById(user._id)
-  // if (!fullName && !avatar) {
-  //   throw new ApiError(401, "fullName or avatar is missing from user")
-  // }
   const existedPost = await Post.findOne({
     $or: [{ title }, { description }]
   })
@@ -94,5 +84,74 @@ const getPostById = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, post, "Post successfully finded"))
 })
 
+const updatePost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const post = await Post.findById(id);
 
-export { createPost, getAllPosts, getCurrentUserPosts, getPostById, updatePost }
+  if (!post) {
+    throw new ApiError(404, "Post does not exist");
+  }
+
+  if (post.author.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Unauthorized access");
+  }
+
+  const { title, description } = req.body;
+
+  const updateFields = {};
+
+  // Check if title is changed
+  if (title?.trim() && title !== post.title) {
+    updateFields.title = title;
+  }
+
+  // Check if description is changed
+  if (description?.trim() && description !== post.description) {
+    updateFields.description = description;
+  }
+
+  // Check if a new image is uploaded
+  const postImageLocalPath = req.files?.postImage?.[0]?.path;
+  if (postImageLocalPath) {
+    const postImage = await uploadOnCloudinary(postImageLocalPath);
+    if (!postImage?.secure_url) {
+      throw new ApiError(400, "Post image failed to upload");
+    }
+
+    if (post.postImage !== postImage.secure_url) {
+      updateFields.postImage = postImage.secure_url;
+    }
+  }
+
+  // 🔁 If nothing actually changed
+  if (Object.keys(updateFields).length === 0) {
+    return res.status(200).json(
+      new ApiResponse(200, post, "No changes detected. Post not updated.")
+    );
+  }
+
+  // 🔄 Update the post
+  const updatedPost = await Post.findByIdAndUpdate(
+    id,
+    { $set: updateFields },
+    { new: true }
+  );
+
+  return res.status(200).json(
+    new ApiResponse(200, updatedPost, "Post updated successfully")
+  );
+});
+
+const deletePost = asyncHandler(async (req, res) => {
+  const { id } = req.params
+
+  if (!id) {
+    throw new ApiError(404, "Post not found")
+  }
+  console.log("ID", id)
+  await Post.findByIdAndDelete(id)
+
+  return res.status(200).json(new ApiResponse(200, {}, "Post deleted successfully"))
+})
+
+export { createPost, getAllPosts, getCurrentUserPosts, getPostById, updatePost, deletePost }

@@ -75,7 +75,7 @@ const getCurrentUserPosts = asyncHandler(async (req, res) => {
 const getPostById = asyncHandler(async (req, res) => {
 
   const { id } = req.params
-  const post = await Post.findById(id)
+  const post = await Post.findById(id).populate("comment")
 
   if (!post) {
     throw new ApiError(404, "Post does not exist")
@@ -148,7 +148,6 @@ const deletePost = asyncHandler(async (req, res) => {
   if (!id) {
     throw new ApiError(404, "Post not found")
   }
-  console.log("ID", id)
   await Post.findByIdAndDelete(id)
 
   return res.status(200).json(new ApiResponse(200, {}, "Post deleted successfully"))

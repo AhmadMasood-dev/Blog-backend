@@ -84,6 +84,22 @@ const getPostById = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, post, "Post successfully finded"))
 })
 
+const getAllCommentsForPost = asyncHandler(async (req, res) => {
+  const { postId } = req.params
+
+  if (!postId) {
+    throw new ApiError(404, "Post Id not provided")
+  }
+
+  const post = await Post.findById(postId).populate("comment")
+
+  if (!post) {
+    throw new ApiError(404, "Post does not exist")
+  }
+
+  return res.status(200).json(new ApiResponse(200, { comments: post.comment }, "All comments fetched successfully"))
+})
+
 const updatePost = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const post = await Post.findById(id);
@@ -111,9 +127,12 @@ const updatePost = asyncHandler(async (req, res) => {
   }
 
   // Check if a new image is uploaded
-  const postImageLocalPath = req.files?.postImage?.[0]?.path;
+  const postImageLocalPath = req.file?.path;
+
   if (postImageLocalPath) {
+
     const postImage = await uploadOnCloudinary(postImageLocalPath);
+
     if (!postImage?.secure_url) {
       throw new ApiError(400, "Post image failed to upload");
     }
@@ -130,7 +149,7 @@ const updatePost = asyncHandler(async (req, res) => {
     );
   }
 
-  // 🔄 Update the post
+
   const updatedPost = await Post.findByIdAndUpdate(
     id,
     { $set: updateFields },
@@ -153,4 +172,4 @@ const deletePost = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Post deleted successfully"))
 })
 
-export { createPost, getAllPosts, getCurrentUserPosts, getPostById, updatePost, deletePost }
+export { createPost, getAllPosts, getCurrentUserPosts, getPostById, updatePost, deletePost, getAllCommentsForPost }

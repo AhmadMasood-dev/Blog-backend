@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
   refreshToken: {
     type: String,
   },
+  posts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Post"
+  }]
 }, { timestamps: true })
 
 userSchema.pre("save", async function (next) {

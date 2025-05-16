@@ -80,7 +80,7 @@ const updateComment = asyncHandler(async (req, res) => {
     throw new ApiError(401, "comment not found")
   }
   const { commentIs } = req.body
-  console.log("commentIs", commentIs)
+
   if (!commentIs) {
     throw new ApiError(401, "updated comment not found")
   }

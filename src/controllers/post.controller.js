@@ -53,7 +53,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 }); // Optional: latest posts first
 
   return res.status(200).json(
-    new ApiResponse(200, posts, "All posts fetched successfully")
+    new ApiResponse(200, { posts }, "All posts fetched successfully")
   );
 });
 

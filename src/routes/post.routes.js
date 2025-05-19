@@ -8,7 +8,7 @@ const router = Router()
 
 router.route('/create-post').post(upload.fields([{ name: 'postImage', maxCount: 1 }]), verifyJWT, createPost)
 
-router.route('/get-posts').get(getAllPosts)
+router.route('/').get(getAllPosts)
 
 router.route('/get-user-posts').get(verifyJWT, getCurrentUserPosts)
 

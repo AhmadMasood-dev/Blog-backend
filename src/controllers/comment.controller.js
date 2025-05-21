@@ -23,7 +23,7 @@ const createComment = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Comment field is required")
   }
   const existedComment = await Comment.findOne({
-    $or: [{ commentIs }, { user: userId }, { post: postId }]
+    $or: [{ commentIs }]
   })
 
   if (existedComment) {
@@ -38,8 +38,11 @@ const createComment = asyncHandler(async (req, res) => {
 
   post.comment.push(comment._id);
   await post.save();
+  // Populate the user field
+  await comment.populate("user", "fullName avatar");
 
-  return res.status(200).json(new ApiResponse(200, comment, "Comment successfull added"))
+
+  return res.status(200).json(new ApiResponse(200, { comment }, "Comment successfull added"))
 })
 
 const getAllComments = asyncHandler(async (req, res) => {

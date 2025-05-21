@@ -12,7 +12,7 @@ router.route('/').get(getAllPosts)
 
 router.route('/get-user-posts').get(verifyJWT, getCurrentUserPosts)
 
-router.route('/getPostById/:id').get(getPostById)
+router.route('/:id').get(getPostById)
 
 router.route('/update-post/:id')
   .patch(verifyJWT, upload.single('postImage'), updatePost);

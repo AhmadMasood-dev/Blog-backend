@@ -75,13 +75,13 @@ const getCurrentUserPosts = asyncHandler(async (req, res) => {
 const getPostById = asyncHandler(async (req, res) => {
 
   const { id } = req.params
-  const post = await Post.findById(id).populate("comment")
+  const post = await Post.findById(id).populate("author comment")
 
   if (!post) {
     throw new ApiError(404, "Post does not exist")
   }
 
-  return res.status(200).json(new ApiResponse(200, post, "Post successfully finded"))
+  return res.status(200).json(new ApiResponse(200, { post }, "Post successfully finded"))
 })
 
 const getAllCommentsForPost = asyncHandler(async (req, res) => {
@@ -91,8 +91,14 @@ const getAllCommentsForPost = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Post Id not provided")
   }
 
-  const post = await Post.findById(postId).populate("comment")
-
+  const post = await Post.findById(postId)
+    .populate({
+      path: "comment",
+      populate: {
+        path: "user",
+        select: "fullName avatar", // choose the fields you want
+      },
+    });
   if (!post) {
     throw new ApiError(404, "Post does not exist")
   }

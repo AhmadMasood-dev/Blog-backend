@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   changeCurrentPassword,
   getCurrentUser,
+  getMe,
   loginUser, logoutUser, refreshAccessToken, registerUser,
   updateAccountDetails,
 } from '../controllers/user.controller.js'
@@ -24,5 +25,7 @@ router.route('/change-password').post(verifyJWT, changeCurrentPassword)
 router.route('/current-user').get(verifyJWT, getCurrentUser)
 
 router.route("/update-account").patch(verifyJWT, upload.single("avatar"), updateAccountDetails)
+
+router.route('/me').get(verifyJWT, getMe);
 
 export default router

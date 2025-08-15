@@ -4,7 +4,7 @@ import { createComment, deleteComment, getAllComments, getCommentById, updateCom
 
 const router = Router()
 
-router.route('/createComment/:postId').post(verifyJWT, createComment)
+router.route('/:postId').post(verifyJWT, createComment)
 
 router.route('/').get(getAllComments)
 
@@ -12,7 +12,7 @@ router.route('/:commentId').get(getCommentById)
 
 router.route('/update-comment/:commentId').post(verifyJWT, updateComment)
 
-router.route('/delete-comment/:commentId').delete(verifyJWT, deleteComment)
+router.route('/:commentId').delete(verifyJWT, deleteComment)
 
 
 

@@ -86,7 +86,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const { email, username, password } = req.body
 
-
+  console.log(email, username, password)
   if (!username && !email) {
     throw new ApiError(400, "username or email is required")
   }
@@ -107,6 +107,8 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
+
+  console.log(accessToken, refreshToken)
 
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
@@ -229,6 +231,19 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user: req.user }, "Current user fetched successfully"))
 })
 
+const getMe = asyncHandler(async (req, res) => {
+  // req.user is set by the auth middleware
+  const user = await User.findById(req.user.id).select('-password -posts');
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+  return res.status(200).json(new ApiResponse(200, { user }, "User details fetched successfully"))
+
+
+});
+
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, email } = req.body
 
@@ -285,4 +300,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { user }, "Account details updated successfully"))
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails }
+
+
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, getMe }

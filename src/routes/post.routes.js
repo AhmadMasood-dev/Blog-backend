@@ -14,7 +14,7 @@ router.route('/get-user-posts').get(verifyJWT, getCurrentUserPosts)
 
 router.route('/:id').get(getPostById)
 
-router.route('/update-post/:id')
+router.route('/update-post/:postId')
   .patch(verifyJWT, upload.single('postImage'), updatePost);
 
 router.route('/:id').delete(verifyJWT, deletePost)

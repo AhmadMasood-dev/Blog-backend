@@ -107,9 +107,8 @@ const getAllCommentsForPost = asyncHandler(async (req, res) => {
 })
 
 const updatePost = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const id = req?.params?.id || req?.params?.postId;
   const post = await Post.findById(id);
-
   if (!post) {
     throw new ApiError(404, "Post does not exist");
   }

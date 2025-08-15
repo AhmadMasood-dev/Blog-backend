@@ -50,7 +50,7 @@ const createPost = asyncHandler(async (req, res) => {
 
 const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find()
-    .sort({ createdAt: -1 }); // Optional: latest posts first
+    .sort({ createdAt: -1 });
 
   return res.status(200).json(
     new ApiResponse(200, { posts }, "All posts fetched successfully")
@@ -65,7 +65,7 @@ const getCurrentUserPosts = asyncHandler(async (req, res) => {
   }
 
   const posts = await Post.find({ author: userId })
-    .sort({ createdAt: -1 }); // Optional: latest posts first
+    .sort({ createdAt: -1 });
 
   return res.status(200).json(
     new ApiResponse(200, posts, "All posts of the logged-in user")
@@ -96,7 +96,7 @@ const getAllCommentsForPost = asyncHandler(async (req, res) => {
       path: "comment",
       populate: {
         path: "user",
-        select: "fullName avatar", // choose the fields you want
+        select: "fullName avatar",
       },
     });
   if (!post) {
@@ -121,17 +121,17 @@ const updatePost = asyncHandler(async (req, res) => {
 
   const updateFields = {};
 
-  // Check if title is changed
+
   if (title?.trim() && title !== post.title) {
     updateFields.title = title;
   }
 
-  // Check if description is changed
+
   if (description?.trim() && description !== post.description) {
     updateFields.description = description;
   }
 
-  // Check if a new image is uploaded
+
   const postImageLocalPath = req.file?.path;
 
   if (postImageLocalPath) {
@@ -147,7 +147,7 @@ const updatePost = asyncHandler(async (req, res) => {
     }
   }
 
-  // 🔁 If nothing actually changed
+
   if (Object.keys(updateFields).length === 0) {
     return res.status(200).json(
       new ApiResponse(200, post, "No changes detected. Post not updated.")
